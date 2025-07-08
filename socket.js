@@ -17,21 +17,24 @@ const socketServer = (server) => {
         });
 
         socket.on("send_message", async (data) => {
-            const {senderId, receiverId, content, type} = data;
+            try {
+                const {senderId, receiverId, content, type} = data;
 
-            const newMessage = new Message({
-                senderId,
-                receiverId,
-                content,
-                type: type || "text"
-            });
+                const newMessage = new Message({
+                    senderId,
+                    receiverId,
+                    content,
+                    type: type || "text"
+                });
 
-            await newMessage.save();
+                await newMessage.save();
 
-            io.to(`user_${receiverId}`).to(`user_${senderId}`).emit("receive_message", newMessage);
-            console.log(`📩 Tin nhắn từ ${senderId} gửi đến ${receiverId}`);
+                io.to(`user_${receiverId}`).to(`user_${senderId}`).emit("receive_message", newMessage);
+                console.log(`📩 Tin nhắn từ ${senderId} gửi đến ${receiverId}`);
+            } catch (err) {
+                console.error("❌ Lỗi khi lưu tin nhắn:", err);
+            }
         });
-
         socket.on("disconnect", () => {
             console.log("Người dùng đã ngắt kết nối: " + socket.id);
         });
