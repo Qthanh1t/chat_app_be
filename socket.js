@@ -1,5 +1,8 @@
 const {Server} = require('socket.io');
 const Message = require('./models/Message');
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 const socketServer = (server) => {
     const io = new Server(server,{
@@ -19,11 +22,19 @@ const socketServer = (server) => {
         socket.on("send_message", async (data) => {
             try {
                 const {senderId, receiverId, content, type} = data;
+                let finalContent = content;
 
+                if (type === "image") {
+                    const imageBuffer = Buffer.from(content, "base64");
+                    const fileName = `${uuidv4()}.png`;
+                    const filePath = path.join(__dirname, "uploads", fileName);
+                    fs.writeFileSync(filePath, imageBuffer);
+                    finalContent = `http://10.0.2.2:5000/uploads/${fileName}`;
+                }
                 const newMessage = new Message({
                     senderId,
                     receiverId,
-                    content,
+                    content: finalContent,
                     type: type || "text"
                 });
 
