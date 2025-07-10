@@ -36,7 +36,7 @@ router.get('/:userId', verifyToken, async (req, res)=>{
             { senderId: otherUserId, receiverId: req.user.id }
         ]
         })
-        .sort({ timestamp: 1 })
+        .sort({ timestamp: -1 })// new first
         .skip(skip)
         .limit(limit);
 
