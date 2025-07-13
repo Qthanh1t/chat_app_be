@@ -1,16 +1,23 @@
 const multer = require('multer');
 const path = require('path');
+require("dotenv").config();
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+//cloud
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
+});
 
 // Cấu hình nơi lưu và tên file
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // lưu vào thư mục uploads/
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'uploads', // thư mục trong Cloudinary
+    allowed_formats: ['jpg', 'png', 'jpeg'],
   },
-  filename: (req, file, cb) => {
-    // đặt tên file: originalname + timestamp + đuôi
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + Date.now() + ext);
-  }
 });
 
 // Kiểm tra file upload (chỉ cho phép ảnh)
