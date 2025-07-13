@@ -2,12 +2,11 @@ const {Server} = require('socket.io');
 const Message = require('./models/Message');
 const fs = require("fs");
 const path = require("path");
-const { v4: uuidv4 } = require("uuid");
 
 const socketServer = (server) => {
     const io = new Server(server,{
         cors: {
-            origin: "*",
+            origin: "https://chat-app-be-be11.onrender.com",
             methods: ["GET", "POST"]
         }
     });
