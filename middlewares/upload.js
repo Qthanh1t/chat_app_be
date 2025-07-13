@@ -1,9 +1,7 @@
 const multer = require('multer');
-const path = require('path');
-require("dotenv").config();
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-//cloud
 const cloudinary = require('cloudinary').v2;
+require("dotenv").config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -11,16 +9,14 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET
 });
 
-// Cấu hình nơi lưu và tên file
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'uploads', // thư mục trong Cloudinary
+  params: (req, file) => ({
+    folder: 'uploads',
     allowed_formats: ['jpg', 'png', 'jpeg'],
-  },
+  }),
 });
 
-// Kiểm tra file upload (chỉ cho phép ảnh)
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -30,7 +26,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Tạo middleware upload
-const upload = multer({ storage, fileFilter });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 module.exports = upload;
