@@ -22,19 +22,11 @@ const socketServer = (server) => {
         socket.on("send_message", async (data) => {
             try {
                 const {senderId, receiverId, content, type} = data;
-                let finalContent = content;
 
-                if (type === "image") {
-                    const imageBuffer = Buffer.from(content, "base64");
-                    const fileName = `${uuidv4()}.png`;
-                    const filePath = path.join(__dirname, "uploads", fileName);
-                    fs.writeFileSync(filePath, imageBuffer);
-                    finalContent = `http://10.0.2.2:5000/uploads/${fileName}`;
-                }
                 const newMessage = new Message({
                     senderId,
                     receiverId,
-                    content: finalContent,
+                    content,
                     type: type || "text"
                 });
 
