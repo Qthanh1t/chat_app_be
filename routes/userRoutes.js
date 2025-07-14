@@ -73,6 +73,11 @@ router.post('/login', async (req, res)=>{
     }
 })
 
+router.post("/logout", verifyToken, (req, res) => {
+  res.json({ message: "Đăng xuất thành công!" });
+});
+
+
 router.get('/friends', verifyToken, async (req, res)=>{
     try{
         const users = await User.find({_id:{$ne: req.user.id}}).select("-password");
