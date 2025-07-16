@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const verifyToken = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/upload');
 
 router.get("/me", verifyToken, async (req, res) => {
   try {
@@ -85,6 +86,29 @@ router.get('/friends', verifyToken, async (req, res)=>{
     }catch(err){
         res.status(500).json({ message: err.message });
     }
+})
+
+router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) => {
+    try {    
+        if (!req.file) {
+            return res.status(400).json({ message: "Không có ảnh được upload." });
+        }
+        const updateUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {avatar: req.file.path},
+            {new: true}
+        );
+        if (!updatedUser) {
+            console.log('User not found');
+            return;
+        }
+        res.json({
+            message: 'Cập nhật avater thành công!',
+        });
+  } catch (err) {
+        console.error("Upload error:", err);
+        res.status(500).json({ message: "Lỗi update avatar ", error: err.message });
+  }
 })
 
 module.exports = router;

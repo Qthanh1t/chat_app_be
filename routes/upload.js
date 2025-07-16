@@ -5,7 +5,6 @@ const verifyToken = require('../middlewares/authMiddleware');
 
 router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   try {
-    console.log("File nhận được:", req.file);
     if (!req.file) {
       return res.status(400).json({ message: "Không có file được upload." });
     }
