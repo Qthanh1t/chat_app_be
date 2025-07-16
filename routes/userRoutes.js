@@ -93,7 +93,7 @@ router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) 
         if (!req.file) {
             return res.status(400).json({ message: "Không có ảnh được upload." });
         }
-        const updateUser = await User.findByIdAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
             req.user.id,
             {avatar: req.file.path},
             {new: true}
