@@ -111,4 +111,51 @@ router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) 
   }
 })
 
+router.post('/changeusername', verifyToken, async (req, res) => {
+    try{
+        const {newUsername} = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {username: newUsername},
+            {new: true},
+        );
+        
+        if(!updatedUser){
+            console.log("User not found!!");
+            return res.status(404).json({ error: "Người dùng không tồn tại." });
+        }
+        res.json({message: "Đổi tên thành công!"});
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error: err.message});
+    }
+    
+})
+
+router.post('/changepassword', verifyToken, async (req, res) => {
+    try{
+        const {newPassword} = req.body;
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {password: hashedPassword},
+            {new: true},
+        );
+        
+        if(!updatedUser){
+            console.log("User not found!!");
+            return res.status(404).json({ error: "Người dùng không tồn tại." });
+        }
+        res.json({message: "Đổi mật khẩu thành công!"});
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error: err.message});
+    }
+    
+})
+
 module.exports = router;
