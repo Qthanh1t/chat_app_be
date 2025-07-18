@@ -104,6 +104,7 @@ router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) 
         }
         res.json({
             message: 'Cập nhật avater thành công!',
+            file: req.file
         });
   } catch (err) {
         console.error("Upload error:", err);
