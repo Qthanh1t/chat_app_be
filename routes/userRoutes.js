@@ -88,7 +88,7 @@ router.get('/friends', verifyToken, async (req, res)=>{
     }
 })
 
-router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) => {
+router.put('/setavatar', verifyToken, upload.single('image'), async (req, res) => {
     try {    
         if (!req.file) {
             return res.status(400).json({ message: "Không có ảnh được upload." });
@@ -112,7 +112,7 @@ router.post('/setavatar', verifyToken, upload.single('image'), async (req, res) 
   }
 })
 
-router.post('/changeusername', verifyToken, async (req, res) => {
+router.put('/changeusername', verifyToken, async (req, res) => {
     try{
         const {newUsername} = req.body;
 
@@ -134,7 +134,7 @@ router.post('/changeusername', verifyToken, async (req, res) => {
     
 })
 
-router.post('/changepassword', verifyToken, async (req, res) => {
+router.put('/changepassword', verifyToken, async (req, res) => {
     try{
         const {newPassword} = req.body;
 
