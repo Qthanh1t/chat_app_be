@@ -46,5 +46,18 @@ router.get('/:userId', verifyToken, async (req, res)=>{
     }
 })
 
+router.delete('/delete/:messageId', verifyToken, async (req, res) => {
+    const deleteMessageId = req.params.messageId;
+    try{
+        const deletedMessage = await Message.deleteOne({_id: deleteMessageId, senderId: req.user.id});
+        if(deletedMessage.deletedCount == 0){
+            return res.status(404).json({message: "Message not found!"});
+        }
+        res.status(200).json({message: "Xóa tin nhắn thành công", id: deleteMessageId});
+    }catch(err){
+        res.status(500).json({message: err.message});
+    }
+})
+
 module.exports  = router
 
