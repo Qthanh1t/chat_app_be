@@ -137,5 +137,28 @@ router.get('/list', verifyToken, async (req, res) => {
   }
 });
 
+// tim kiem ban be
+router.get('/search', verifyToken, async (req, res) => {
+  try {
+    const query = req.query.query?.trim();
+    if (!query) return res.status(400).json({ message: 'Thiếu từ khóa tìm kiếm' });
+
+    const currentUserId = req.user._id;
+
+    // Tìm các user phù hợp, loại trừ chính mình
+    const users = await User.find({
+      _id: { $ne: currentUserId }, // loại chính mình
+      $or: [
+        { username: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } }
+      ]
+    }).limit(20).select('_id username email avatar');
+
+    res.json(users);
+  } catch (err) {
+    console.error('Lỗi search:', err);
+    res.status(500).json({ message: 'Lỗi server khi tìm kiếm người dùng' });
+  }
+});
 
 module.exports = router;
