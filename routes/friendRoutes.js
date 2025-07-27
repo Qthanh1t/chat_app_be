@@ -3,6 +3,7 @@ const verifyToken = require('../middlewares/authMiddleware');
 const router = express.Router();
 const FriendRequest = require('../models/FriendRequest');
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 //gui loi moi ket ban
 router.post('/request/:userId', verifyToken, async (req, res) => {
@@ -143,11 +144,16 @@ router.get('/search', verifyToken, async (req, res) => {
     const query = req.query.query?.trim();
     if (!query) return res.status(400).json({ message: 'Thiếu từ khóa tìm kiếm' });
 
-    const currentUserId = req.user._id;
+    const currentUserId = req.user.id;
+    const me = await User.findById(currentUserId);
 
+    const excludeIds = [
+      currentUserId,
+      ...me.friends,
+    ]
     // Tìm các user phù hợp, loại trừ chính mình
     const users = await User.find({
-      _id: { $ne: currentUserId }, // loại chính mình
+      _id: { $nin: excludeIds }, // loại chính mình và bạn bè
       $or: [
         { username: { $regex: query, $options: 'i' } },
         { email: { $regex: query, $options: 'i' } }
