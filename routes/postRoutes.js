@@ -35,6 +35,18 @@ router.get('/posts', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Lỗi lấy danh sách bài viết' });
   }
 });
+//get post by id
+router.get('/post/:id', verifyToken, async (req, res) => {
+  const postId = req.params.id;
+  try {
+    const post = await Post.findById(postId)
+      .populate('author', 'username email avatar')
+      .populate('comments.user', 'username avatar')
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi lấy bài viết' });
+  }
+});
 
 //like/unlike
 router.put('/like/:id', verifyToken, async (req, res) => {
