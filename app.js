@@ -6,6 +6,7 @@ const messageRoutes = require("./routes/messageRoutes.js");
 const friendRoutes = require("./routes/friendRoutes.js");
 const upload = require("./routes/upload.js");
 const postRoutes = require("./routes/postRoutes.js");
+const auth = require("./routes/auth.js");
 const app = express();
 
 // Middleware
@@ -21,6 +22,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/upload", upload);
 app.use("/api/friends", friendRoutes);
 app.use("/api/posts",postRoutes);
+app.use("/api/auth", auth);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

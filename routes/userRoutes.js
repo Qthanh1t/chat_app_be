@@ -41,44 +41,6 @@ router.post('/register',async (req, res)=>{
     }
 })
 
-router.post('/login', async (req, res)=>{
-    const {email, password} = req.body;
-
-    try{
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(400).json({message: "Email hoặc mật khẩu không đúng!!"});
-        }
-        const validPassword = await bcrypt.compare(password, user.password);
-        if(!validPassword){
-            return res.status(400).json({message: "Email hoặc mật khẩu không đúng!!"});
-        }
-
-        const token = jwt.sign(
-            {id: user._id, username: user.username},
-            process.env.JWT_SECRET,
-            {expiresIn: '1h'}
-        );
-        res.json({
-            message: "Đăng nhập thành công!!",
-            token: token,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                avatar:  user.avatar
-            }
-        });
-    } catch(err){
-        res.status(500).json({message: err.message});
-    }
-})
-
-router.post("/logout", verifyToken, (req, res) => {
-  res.json({ message: "Đăng xuất thành công!" });
-});
-
-
 router.get('/friends', verifyToken, async (req, res)=>{
     try{
         const users = await User.find({_id:{$ne: req.user.id}}).select("-password");
