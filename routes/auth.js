@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const jwt = require("jsonwebtoken");
 const RefreshToken = require("../models/RefreshToken");
-const { generateAccessToken, generateRefreshToken } = require("../controllers/auth");
+const { generateAccessToken, generateRefreshToken, regenAccessToken } = require("../controllers/auth");
 
 router.post('/login', async (req, res)=>{
     const {email, password} = req.body;
@@ -61,7 +61,7 @@ router.post("/refreshtoken", async (req, res) => {
         jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
             if (err) return res.status(403).json({ message: "Refresh token hết hạn hoặc không hợp lệ" });
 
-            const newAccessToken = generateAccessToken(user);
+            const newAccessToken = regenAccessToken(user);
             res.json({ accessToken: newAccessToken });
         });
     } catch(err){

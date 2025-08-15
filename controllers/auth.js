@@ -8,6 +8,14 @@ const generateAccessToken = (user) => {
         { expiresIn: "15m" } // 15 phút
     );
 };
+// Tạo lại accessToken
+const regenAccessToken = (user) => {
+    return jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET,
+        { expiresIn: "15m" } // 15 phút
+    );
+};
 
 // Tạo Refresh Token (thời gian dài hơn)
 const generateRefreshToken = (user) => {
@@ -18,4 +26,4 @@ const generateRefreshToken = (user) => {
     );
 };
 
-module.exports = { generateAccessToken, generateRefreshToken };
+module.exports = { generateAccessToken,regenAccessToken, generateRefreshToken };
