@@ -1,6 +1,7 @@
 const express = require('express');
 const verifyToken = require('../middlewares/authMiddleware');
 const Message = require('../models/Message');
+const mongoose = require('mongoose');
 const router = express.Router()
 
 router.post('/send', verifyToken,async (req, res)=>{
@@ -21,6 +22,64 @@ router.post('/send', verifyToken,async (req, res)=>{
         res.status(500).json({ message: err.message });
     }
 })
+
+router.get('/conversations', verifyToken, async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.user.id); 
+
+    const conversations = await Message.aggregate([
+      {
+        $match: {
+          $or: [
+            { senderId: userId },
+            { receiverId: userId }
+          ]
+        }
+      },
+      {
+        $sort: { timestamp: -1 } // sắp xếp trước để $first lấy message mới nhất
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ["$senderId", userId] },
+              "$receiverId",
+              "$senderId"
+            ]
+          },
+          lastMessage: { $first: "$$ROOT" }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      {
+        $unwind: "$user"
+      },
+      {
+        $project: {
+          _id: 0,
+          user: { _id: 1, username: 1, avatar: 1 },
+          lastMessage: 1
+        }
+      },
+      {
+        $sort: { "lastMessage.timestamp": -1 }
+      }
+    ]);
+
+    res.json(conversations);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
 
 router.get('/:userId', verifyToken, async (req, res)=>{
     const otherUserId = req.params.userId;
