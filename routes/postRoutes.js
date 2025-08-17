@@ -26,11 +26,17 @@ router.post('/posts', verifyToken, upload.array('images'), async (req, res) => {
 //xem bai viet
 router.get('/posts', verifyToken, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const posts = await Post.find()
       .populate('author', 'username email avatar')
       .populate('comments.user', 'username avatar')
-      .sort({ createdAt: -1 });
-    res.json(posts);
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    res.json({posts: posts, page, limit});
   } catch (err) {
     res.status(500).json({ message: 'Lỗi lấy danh sách bài viết' });
   }
