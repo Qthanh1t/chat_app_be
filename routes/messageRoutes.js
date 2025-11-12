@@ -74,7 +74,7 @@ router.get('/:conversationId', verifyToken, async (req, res) => {
             .limit(limit)
             .populate('senderId', 'username avatar'); // Lấy info sender
 
-        res.json({ messages: messages.reverse(), page, limit }); // Reverse để hiển thị (cũ trước, mới sau)
+        res.json({ messages: messages, page, limit });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
