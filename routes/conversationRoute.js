@@ -7,14 +7,13 @@ const router = express.Router();
 
 // Tạo một cuộc hội thoại mới (cả 1-1 và nhóm)
 router.post('/', verifyToken, async (req, res) => {
-    const { participants, type, groupName } = req.body; // participants là một array user IDs
+    const { participants, type, groupName } = req.body;
     const userId = req.user.id;
 
     if (!participants || participants.length === 0) {
         return res.status(400).json({ message: "Cần có người tham gia" });
     }
 
-    // Đảm bảo người tạo cũng ở trong nhóm
     const allParticipants = [...new Set([...participants, userId])];
 
     if (type === 'group' && !groupName) {
@@ -28,8 +27,12 @@ router.post('/', verifyToken, async (req, res) => {
                 type: 'private',
                 participants: { $all: allParticipants }
             });
+
             if (existing) {
-                return res.status(200).json(existing); // Trả về conversation đã có
+                // SỬA LỖI QUAN TRỌNG Ở ĐÂY:
+                // Phải populate trước khi trả về
+                const populatedExisting = await existing.populate('participants', 'username avatar');
+                return res.status(200).json(populatedExisting);
             }
         } catch (err) {
             return res.status(500).json({ message: err.message });
@@ -47,10 +50,10 @@ router.post('/', verifyToken, async (req, res) => {
 
         const savedConversation = await newConversation.save();
 
-        // Populate thông tin người tham gia trước khi gửi về
-        await savedConversation.populate('participants', 'username avatar');
+        // Populate thông tin người tham gia trước khi gửi về (Luồng này đã đúng)
+        const populatedNew = await savedConversation.populate('participants', 'username avatar');
 
-        res.status(201).json(savedConversation);
+        res.status(201).json(populatedNew);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
