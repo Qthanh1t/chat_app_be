@@ -64,6 +64,13 @@ const socketServer = (server) => {
             }
         });
 
+        socket.on("join_conversation_room", (conversationId) => {
+            if (!conversationId) return;
+            const roomName = `conversation_${conversationId}`;
+            socket.join(roomName);
+            console.log(`✅ Socket ${socket.id} đã chủ động join room ${roomName}`);
+        });
+
         socket.on("disconnect", () => {
             console.log("Người dùng đã ngắt kết nối: " + socket.id);
         });
