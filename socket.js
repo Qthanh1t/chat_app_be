@@ -5,7 +5,7 @@ const Conversation = require('./models/Conversation'); // Import Conversation
 const socketServer = (server) => {
     const io = new Server(server, {
         cors: {
-            origin: "https://chat-app-be-be11.onrender.com", // Cân nhắc dùng "*" hoặc domain FE
+            origin: "*",
             methods: ["GET", "POST"]
         }
     });
